@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="源码分析," />
 
 
 
@@ -94,16 +94,18 @@
 
 
 
-<meta name="description" content="厚积薄发，志在必得">
-<meta property="og:type" content="website">
-<meta property="og:title" content="just code博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
+<meta name="keywords" content="源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android之HandlerThread的探索">
+<meta property="og:url" content="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/index.html">
 <meta property="og:site_name" content="just code博客">
-<meta property="og:description" content="厚积薄发，志在必得">
+<meta property="og:description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-19T10:33:26.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="just code博客">
-<meta name="twitter:description" content="厚积薄发，志在必得">
+<meta name="twitter:title" content="Android之HandlerThread的探索">
+<meta name="twitter:description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
 
 
 
@@ -132,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/"/>
 
 
 
 
 
-  <title>just code博客</title>
+  <title>Android之HandlerThread的探索 | just code博客</title>
   
 
 
@@ -163,9 +165,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -248,9 +248,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -280,9 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/19/Android之HandlerThread的探索/" itemprop="url">Android之HandlerThread的探索</a></h1>
+          <h1 class="post-title" itemprop="name headline">Android之HandlerThread的探索</h1>
         
 
         <div class="post-meta">
@@ -364,9 +362,7 @@
       
 
       
-        
-          
-            <p>之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击<a href="https://www.jianshu.com/p/1c244014a495" target="_blank" rel="noopener">intentHandler</a>），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。</p>
+        <p>之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击<a href="https://www.jianshu.com/p/1c244014a495" target="_blank" rel="noopener">intentHandler</a>），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。</p>
 <h2 id="问题提出"><a href="#问题提出" class="headerlink" title="问题提出"></a>问题提出</h2><p>1、HandlerThread是什么？</p>
 <p>2、HandlerThread跟普通的Thread有何区别？</p>
 <p>3、HandlerThread内部实现分析。</p>
@@ -386,8 +382,6 @@
 <p>这里面，isAlive()方法的意思是线程不正常运行就返回null，接着，如果looper还没创建好就wait()等待，创建后notifyAll。在这里，我们来分析下为什么会用到wait，notifyAll等相关：handler对象的创建方法（getThreadHandler()）调用是在UI线程里面，but，Looper在一个线程中执行创建的，为了确保looper创建完成之后在创建handler对象，所以需要wait(),notify()来处理线程同步问题。</p>
 <p>总结：HandlerThread其实就是一个封装了handler的Thread的子类，做好前奏工作后，让我们在线程中直接使用handler来处理一个或者多个异步操作。使用场景，就是适合那些多个并按顺序执行的耗时任务的相关需求，可以跟intentService配合使用。（intentService内部异步处理用的就是HandlerThread）</p>
 
-          
-        
       
     </div>
     
@@ -402,14 +396,20 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
 
       
 
       
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -419,10 +419,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -430,6 +431,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -450,8 +455,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.png"
@@ -526,6 +540,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题提出"><span class="nav-number">1.</span> <span class="nav-text">问题提出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析与解决问题"><span class="nav-number">2.</span> <span class="nav-text">分析与解决问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -646,10 +676,10 @@
 
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
