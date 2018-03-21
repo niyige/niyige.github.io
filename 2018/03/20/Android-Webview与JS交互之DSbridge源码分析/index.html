@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="DSbridge," />
 
 
 
@@ -94,16 +94,20 @@
 
 
 
-<meta name="description" content="厚积薄发，志在必得">
-<meta property="og:type" content="website">
-<meta property="og:title" content="just code博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="自从有了Webview与JS交互，而我又使用过并且有了一定的理解，真心的体会到让开发者能在web页相关开发为所欲为。demo地址     比如,在一个活动页面，需要用户登陆后的userId，才能领取活动页面的奖品，怎么获取呢？这个时候，你可以通过js跳转到登录页，登陆成功带着userId回到活动页，就可以进行下一步动作了，美滋滋~   上面只是个简单的例子，本章的主角是DSbridge，不过，在这">
+<meta name="keywords" content="DSbridge">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Webview与JS交互之DSbridge源码分析">
+<meta property="og:url" content="http://yoursite.com/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/index.html">
 <meta property="og:site_name" content="just code博客">
-<meta property="og:description" content="厚积薄发，志在必得">
+<meta property="og:description" content="自从有了Webview与JS交互，而我又使用过并且有了一定的理解，真心的体会到让开发者能在web页相关开发为所欲为。demo地址     比如,在一个活动页面，需要用户登陆后的userId，才能领取活动页面的奖品，怎么获取呢？这个时候，你可以通过js跳转到登录页，登陆成功带着userId回到活动页，就可以进行下一步动作了，美滋滋~   上面只是个简单的例子，本章的主角是DSbridge，不过，在这">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/case.jpg">
+<meta property="og:updated_time" content="2018-03-21T00:55:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="just code博客">
-<meta name="twitter:description" content="厚积薄发，志在必得">
+<meta name="twitter:title" content="Android Webview与JS交互之DSbridge源码分析">
+<meta name="twitter:description" content="自从有了Webview与JS交互，而我又使用过并且有了一定的理解，真心的体会到让开发者能在web页相关开发为所欲为。demo地址     比如,在一个活动页面，需要用户登陆后的userId，才能领取活动页面的奖品，怎么获取呢？这个时候，你可以通过js跳转到登录页，登陆成功带着userId回到活动页，就可以进行下一步动作了，美滋滋~   上面只是个简单的例子，本章的主角是DSbridge，不过，在这">
+<meta name="twitter:image" content="http://yoursite.com/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/case.jpg">
 
 
 
@@ -132,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/"/>
 
 
 
 
 
-  <title>just code博客</title>
+  <title>Android Webview与JS交互之DSbridge源码分析 | just code博客</title>
   
 
 
@@ -163,9 +167,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -248,9 +250,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -280,9 +282,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/" itemprop="url">Android Webview与JS交互之DSbridge源码分析</a></h1>
+          <h1 class="post-title" itemprop="name headline">Android Webview与JS交互之DSbridge源码分析</h1>
         
 
         <div class="post-meta">
@@ -364,9 +364,7 @@
       
 
       
-        
-          
-            <p>自从有了Webview与JS交互，而我又使用过并且有了一定的理解，真心的体会到让开发者能在web页相关开发为所欲为。<a href="https://github.com/niyige/DSBridgeWebDemo" target="_blank" rel="noopener">demo地址</a></p>
+        <p>自从有了Webview与JS交互，而我又使用过并且有了一定的理解，真心的体会到让开发者能在web页相关开发为所欲为。<a href="https://github.com/niyige/DSBridgeWebDemo" target="_blank" rel="noopener">demo地址</a></p>
 <p><img src="/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/case.jpg" alt="case.jpg"></p>
 <p>   比如,在一个活动页面，需要用户登陆后的userId，才能领取活动页面的奖品，怎么获取呢？这个时候，你可以通过js跳转到登录页，登陆成功带着userId回到活动页，就可以进行下一步动作了，美滋滋~<br>   上面只是个简单的例子，本章的主角是DSbridge，不过，在这之前，我们先回顾下，在没封装的时候，Webview与JS交互的实现。（我之前一直在用的方式）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/**js调用android端的方法：**/</span><br><span class="line">//主要看showLog这个方法</span><br><span class="line">public void <span class="function"><span class="title">initView</span></span>() &#123; </span><br><span class="line"> webView.getSettings().setJavaScriptEnabled(<span class="literal">true</span>);                                     webView.addJavascriptInterface(new TestEntity(),<span class="string">"test"</span>);</span><br><span class="line">&#125;</span><br><span class="line">public classTestEntity &#123; </span><br><span class="line"> @JavascriptInterface</span><br><span class="line">public void showLog(String data) &#123;</span><br><span class="line">      Log.i(<span class="string">"android"</span>,data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>js调用showLog（）方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">handleAndroidMethod</span></span>() &#123;</span><br><span class="line">    test.showLog(<span class="string">'hhh'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
@@ -381,8 +379,6 @@
 <p>本文demo地址：<a href="https://github.com/niyige/DSBridgeWebDemo" target="_blank" rel="noopener">https://github.com/niyige/DSBridgeWebDemo</a><br>有什么问题欢迎交流：<a href="mailto:893007592@qq.com" target="_blank" rel="noopener">893007592@qq.com</a></p>
 <p>相关资料:<br> <a href="https://github.com/wendux/DSBridge-Android" target="_blank" rel="noopener">https://github.com/wendux/DSBridge-Android</a></p>
 
-          
-        
       
     </div>
     
@@ -397,185 +393,36 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Egan ouyang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="just code博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/19/Android之HandlerThread的探索/" itemprop="url">Android之HandlerThread的探索</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-19T16:59:20+08:00">
-                2018-03-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Android/" itemprop="url" rel="index">
-                    <span itemprop="name">Android</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2018/03/19/Android之HandlerThread的探索/" class="leancloud_visitors" data-flag-title="Android之HandlerThread的探索">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
+            <a href="/tags/DSbridge/" rel="tag"># DSbridge</a>
           
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击<a href="https://www.jianshu.com/p/1c244014a495" target="_blank" rel="noopener">intentHandler</a>），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。</p>
-<h2 id="问题提出"><a href="#问题提出" class="headerlink" title="问题提出"></a>问题提出</h2><p>1、HandlerThread是什么？</p>
-<p>2、HandlerThread跟普通的Thread有何区别？</p>
-<p>3、HandlerThread内部实现分析。</p>
-<p>4、HandlerThread使用场景。</p>
-<h2 id="分析与解决问题"><a href="#分析与解决问题" class="headerlink" title="分析与解决问题"></a>分析与解决问题</h2><p>我们先看看源码里面对HandlerThread的解释：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Handy class <span class="keyword">for</span> starting a new thread that has a looper. The looper can <span class="keyword">then</span> be </span><br><span class="line"> * used to create handler classes. Note that start() must still be called.</span><br><span class="line"> */</span><br></pre></td></tr></table></figure></p>
-<p>大概讲的意思就是：HandlerThread是一个拥有looper的子线程，这个looper可以用来创建handler类。注意，创建的HandlerThread对象的start()方法一定要执行。</p>
-<p>很好，现在我们知道了，HandlerThread是一个继承与Thread的子线程，区别就在于，HandlerThread提供了创建handler对象的looper。</p>
-<p>接下来，看看它的内部实现：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public HandlerThread(String name) &#123;</span><br><span class="line">    super(name);</span><br><span class="line">    mPriority = Process.THREAD_PRIORITY_DEFAULT;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * Constructs a HandlerThread.</span><br><span class="line"> * @param name</span><br><span class="line"> * @param priority The priority to run the thread at. The value supplied must be from </span><br><span class="line"> * &#123;@link android.os.Process&#125; and not from java.lang.Thread.</span><br><span class="line"> */</span><br><span class="line">public HandlerThread(String name, int priority) &#123;</span><br><span class="line">    super(name);</span><br><span class="line">    mPriority = priority;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>构造函数里面的mPriority，优先级相关的，可以根据自己的需求去设置。</p>
-<p>每次线程启动调用start()方法的时候，都会执行run()方法，来看看这个方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void <span class="function"><span class="title">run</span></span>() &#123;</span><br><span class="line">    mTid = Process.myTid();</span><br><span class="line">    Looper.prepare();</span><br><span class="line">    synchronized (this) &#123;</span><br><span class="line">        mLooper = Looper.myLooper();</span><br><span class="line">        notifyAll();</span><br><span class="line">    &#125;</span><br><span class="line">    Process.setThreadPriority(mPriority);</span><br><span class="line">    onLooperPrepared();</span><br><span class="line">    Looper.loop();</span><br><span class="line">    mTid = -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>在Looper.prepare()里面，其实就是创建looper对象，并赋值给mLooper.onLooperPrepared()里面是空方法，我们可以重写，做一些初始化的操作，然后调用Looper.loop()方法启动了了loop。在这里，我们有一些疑惑，synchronized？notifyAll()？稍后我们在来分析，我们先看看prepare()内部实现：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public static void <span class="function"><span class="title">prepare</span></span>() &#123;</span><br><span class="line">       prepare(<span class="literal">true</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   /**</span><br><span class="line">    * sThreadLocal.get() will <span class="built_in">return</span> null unless you<span class="string">'ve called prepare().</span></span><br><span class="line"><span class="string">    */</span></span><br><span class="line"><span class="string">   static final ThreadLocal&lt;Looper&gt; sThreadLocal = new ThreadLocal&lt;Looper&gt;();</span></span><br><span class="line"><span class="string">   private static void prepare(boolean quitAllowed) &#123;</span></span><br><span class="line"><span class="string">       if (sThreadLocal.get() != null) &#123;</span></span><br><span class="line"><span class="string">           throw new RuntimeException("Only one Looper may be created per thread");</span></span><br><span class="line"><span class="string">       &#125;</span></span><br><span class="line"><span class="string">       sThreadLocal.set(new Looper(quitAllowed));</span></span><br><span class="line"><span class="string">   &#125;</span></span><br></pre></td></tr></table></figure></p>
-<p>把创建的Looper对象放到的sThreadLocal。放进去总要取出来吧，我们来看看Looper.myLooper()内部的实现：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * Return the Looper object associated with the current thread.  Returns</span><br><span class="line"> * null <span class="keyword">if</span> the calling thread is not associated with a Looper.</span><br><span class="line"> */</span><br><span class="line">public static @Nullable Looper <span class="function"><span class="title">myLooper</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> sThreadLocal.get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>贼简单，就是把之前存进去的looper对象取出来并返回。现在looper创建了，总要用上吧，这个时候就应该想到handler了，我们来看看提供的获取handler的方法getThreadHandler()：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @<span class="built_in">return</span> a shared &#123;@link Handler&#125; associated with this thread</span><br><span class="line"> * @hide</span><br><span class="line"> */</span><br><span class="line">@NonNull</span><br><span class="line">public Handler <span class="function"><span class="title">getThreadHandler</span></span>() &#123;</span><br><span class="line">    <span class="keyword">if</span> (mHandler == null) &#123;</span><br><span class="line">        mHandler = new Handler(getLooper());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> mHandler;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这个方法可以获取一个有当前子线程looper的handler对象，我们来看看getLooper()，可以看出是获取looper对象的方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * This method returns the Looper associated with this thread. If this thread not been started</span><br><span class="line">  * or <span class="keyword">for</span> any reason isAlive() returns <span class="literal">false</span>, this method will <span class="built_in">return</span> null. If this thread</span><br><span class="line">  * has been started, this method will block until the looper has been initialized.  </span><br><span class="line">  * @<span class="built_in">return</span> The looper.</span><br><span class="line">  */</span><br><span class="line"> public Looper <span class="function"><span class="title">getLooper</span></span>() &#123;</span><br><span class="line">     <span class="keyword">if</span> (!isAlive()) &#123;</span><br><span class="line">         <span class="built_in">return</span> null;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     // If the thread has been started, <span class="built_in">wait</span> until the looper has been created.</span><br><span class="line">     synchronized (this) &#123;</span><br><span class="line">         <span class="keyword">while</span> (isAlive() &amp;&amp; mLooper == null) &#123;</span><br><span class="line">             try &#123;</span><br><span class="line">                 <span class="built_in">wait</span>();</span><br><span class="line">             &#125; catch (InterruptedException e) &#123;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="built_in">return</span> mLooper;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里面，isAlive()方法的意思是线程不正常运行就返回null，接着，如果looper还没创建好就wait()等待，创建后notifyAll。在这里，我们来分析下为什么会用到wait，notifyAll等相关：handler对象的创建方法（getThreadHandler()）调用是在UI线程里面，but，Looper在一个线程中执行创建的，为了确保looper创建完成之后在创建handler对象，所以需要wait(),notify()来处理线程同步问题。</p>
-<p>总结：HandlerThread其实就是一个封装了handler的Thread的子类，做好前奏工作后，让我们在线程中直接使用handler来处理一个或者多个异步操作。使用场景，就是适合那些多个并按顺序执行的耗时任务的相关需求，可以跟intentService配合使用。（intentService内部异步处理用的就是HandlerThread）</p>
-<p>有什么问题欢迎交流：<a href="mailto:893007592@qq.com" target="_blank" rel="noopener">893007592@qq.com</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/19/Android之HandlerThread的探索/" rel="next" title="Android之HandlerThread的探索">
+                <i class="fa fa-chevron-left"></i> Android之HandlerThread的探索
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
       
     </footer>
   </div>
@@ -585,10 +432,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -596,6 +444,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -812,10 +664,10 @@
 
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 

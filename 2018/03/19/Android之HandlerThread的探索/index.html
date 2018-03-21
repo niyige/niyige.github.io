@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="源码分析," />
+  <meta name="keywords" content="Android源码分析," />
 
 
 
@@ -95,14 +95,14 @@
 
 
 <meta name="description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
-<meta name="keywords" content="源码分析">
+<meta name="keywords" content="Android源码分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android之HandlerThread的探索">
 <meta property="og:url" content="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/index.html">
 <meta property="og:site_name" content="just code博客">
 <meta property="og:description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-19T10:33:26.000Z">
+<meta property="og:updated_time" content="2018-03-20T12:06:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android之HandlerThread的探索">
 <meta name="twitter:description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
@@ -181,7 +181,7 @@
       </a>
     </div>
       
-        <p class="site-subtitle">放码过来吧</p>
+        <p class="site-subtitle">放码过来吧,有问题联系  893007592@qq.com</p>
       
   </div>
 
@@ -381,6 +381,7 @@
 <p>这个方法可以获取一个有当前子线程looper的handler对象，我们来看看getLooper()，可以看出是获取looper对象的方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * This method returns the Looper associated with this thread. If this thread not been started</span><br><span class="line">  * or <span class="keyword">for</span> any reason isAlive() returns <span class="literal">false</span>, this method will <span class="built_in">return</span> null. If this thread</span><br><span class="line">  * has been started, this method will block until the looper has been initialized.  </span><br><span class="line">  * @<span class="built_in">return</span> The looper.</span><br><span class="line">  */</span><br><span class="line"> public Looper <span class="function"><span class="title">getLooper</span></span>() &#123;</span><br><span class="line">     <span class="keyword">if</span> (!isAlive()) &#123;</span><br><span class="line">         <span class="built_in">return</span> null;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     // If the thread has been started, <span class="built_in">wait</span> until the looper has been created.</span><br><span class="line">     synchronized (this) &#123;</span><br><span class="line">         <span class="keyword">while</span> (isAlive() &amp;&amp; mLooper == null) &#123;</span><br><span class="line">             try &#123;</span><br><span class="line">                 <span class="built_in">wait</span>();</span><br><span class="line">             &#125; catch (InterruptedException e) &#123;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="built_in">return</span> mLooper;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
 <p>这里面，isAlive()方法的意思是线程不正常运行就返回null，接着，如果looper还没创建好就wait()等待，创建后notifyAll。在这里，我们来分析下为什么会用到wait，notifyAll等相关：handler对象的创建方法（getThreadHandler()）调用是在UI线程里面，but，Looper在一个线程中执行创建的，为了确保looper创建完成之后在创建handler对象，所以需要wait(),notify()来处理线程同步问题。</p>
 <p>总结：HandlerThread其实就是一个封装了handler的Thread的子类，做好前奏工作后，让我们在线程中直接使用handler来处理一个或者多个异步操作。使用场景，就是适合那些多个并按顺序执行的耗时任务的相关需求，可以跟intentService配合使用。（intentService内部异步处理用的就是HandlerThread）</p>
+<p>有什么问题欢迎交流：<a href="mailto:893007592@qq.com" target="_blank" rel="noopener">893007592@qq.com</a></p>
 
       
     </div>
@@ -398,7 +399,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+            <a href="/tags/Android源码分析/" rel="tag"># Android源码分析</a>
           
         </div>
       
@@ -407,6 +408,22 @@
       
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/" rel="prev" title="Android Webview与JS交互之DSbridge源码分析">
+                Android Webview与JS交互之DSbridge源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -480,7 +497,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -502,7 +519,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -516,12 +533,12 @@
           
             
               <span class="links-of-author-item">
-                <a href="https://www.jianshu.com/u/5fea2abad3ac" target="_blank" title="jianshu">
+                <a href="https://www.jianshu.com/u/5fea2abad3ac" target="_blank" title="简书">
                   
                     <i class="fa fa-fw fa-globe"></i>
                   
                     
-                      jianshu
+                      简书
                     
                 </a>
               </span>
