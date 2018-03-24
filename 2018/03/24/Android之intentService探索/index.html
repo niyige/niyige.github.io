@@ -94,18 +94,22 @@
 
 
 
-<meta name="description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
+<meta name="description" content="问题提出习惯性的带着问题去研究事物的本质，问题提出：  intentService是什么？ intentService既然是服务？跟普通的service有什么区别？ 既然有service，为什么还会出现intentService，有什么优势呢？ intentService的使用场景。  分析与解决问题intentService是什么，我们来看看官方的解释： 官网的意思就是：intentServic">
 <meta name="keywords" content="Android源码分析">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Android之HandlerThread的探索">
-<meta property="og:url" content="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/index.html">
+<meta property="og:title" content="Android之intentService探索">
+<meta property="og:url" content="http://yoursite.com/2018/03/24/Android之intentService探索/index.html">
 <meta property="og:site_name" content="just code博客">
-<meta property="og:description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
+<meta property="og:description" content="问题提出习惯性的带着问题去研究事物的本质，问题提出：  intentService是什么？ intentService既然是服务？跟普通的service有什么区别？ 既然有service，为什么还会出现intentService，有什么优势呢？ intentService的使用场景。  分析与解决问题intentService是什么，我们来看看官方的解释： 官网的意思就是：intentServic">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-20T12:06:25.000Z">
+<meta property="og:image" content="http://yoursite.com/2018/03/24/Android之intentService探索/intentService.jpeg">
+<meta property="og:image" content="http://yoursite.com/2018/03/24/Android之intentService探索/2.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/03/24/Android之intentService探索/show.gif">
+<meta property="og:updated_time" content="2018-03-24T14:13:58.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android之HandlerThread的探索">
-<meta name="twitter:description" content="之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击intentHandler），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。 问题提出1、HandlerThread是什么？ 2、HandlerThread跟普通的Thread有何区别？ 3、HandlerThread内部">
+<meta name="twitter:title" content="Android之intentService探索">
+<meta name="twitter:description" content="问题提出习惯性的带着问题去研究事物的本质，问题提出：  intentService是什么？ intentService既然是服务？跟普通的service有什么区别？ 既然有service，为什么还会出现intentService，有什么优势呢？ intentService的使用场景。  分析与解决问题intentService是什么，我们来看看官方的解释： 官网的意思就是：intentServic">
+<meta name="twitter:image" content="http://yoursite.com/2018/03/24/Android之intentService探索/intentService.jpeg">
 
 
 
@@ -134,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/24/Android之intentService探索/"/>
 
 
 
 
 
-  <title>Android之HandlerThread的探索 | just code博客</title>
+  <title>Android之intentService探索 | just code博客</title>
   
 
 
@@ -263,7 +267,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/19/Android之HandlerThread的探索/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/Android之intentService探索/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Egan ouyang">
@@ -280,7 +284,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Android之HandlerThread的探索</h1>
+          <h1 class="post-title" itemprop="name headline">Android之intentService探索</h1>
         
 
         <div class="post-meta">
@@ -292,8 +296,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-19T16:59:20+08:00">
-                2018-03-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T21:59:30+08:00">
+                2018-03-24
               </time>
             
 
@@ -332,7 +336,7 @@
 
           
           
-             <span id="/2018/03/19/Android之HandlerThread的探索/" class="leancloud_visitors" data-flag-title="Android之HandlerThread的探索">
+             <span id="/2018/03/24/Android之intentService探索/" class="leancloud_visitors" data-flag-title="Android之intentService探索">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -362,26 +366,27 @@
       
 
       
-        <p>之前分析了IntentHandler的内部实现原理，里面用的就是HandlerThread来进行异步处理事件（想看可以点击<a href="https://www.jianshu.com/p/1c244014a495" target="_blank" rel="noopener">intentHandler</a>），然而当时并没有解释HandlerThread跟普通的Thread的区别，现在来分析下它的内部实现相关。</p>
-<h2 id="问题提出"><a href="#问题提出" class="headerlink" title="问题提出"></a>问题提出</h2><p>1、HandlerThread是什么？</p>
-<p>2、HandlerThread跟普通的Thread有何区别？</p>
-<p>3、HandlerThread内部实现分析。</p>
-<p>4、HandlerThread使用场景。</p>
-<h2 id="分析与解决问题"><a href="#分析与解决问题" class="headerlink" title="分析与解决问题"></a>分析与解决问题</h2><p>我们先看看源码里面对HandlerThread的解释：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Handy class <span class="keyword">for</span> starting a new thread that has a looper. The looper can <span class="keyword">then</span> be </span><br><span class="line"> * used to create handler classes. Note that start() must still be called.</span><br><span class="line"> */</span><br></pre></td></tr></table></figure></p>
-<p>大概讲的意思就是：HandlerThread是一个拥有looper的子线程，这个looper可以用来创建handler类。注意，创建的HandlerThread对象的start()方法一定要执行。</p>
-<p>很好，现在我们知道了，HandlerThread是一个继承与Thread的子线程，区别就在于，HandlerThread提供了创建handler对象的looper。</p>
-<p>接下来，看看它的内部实现：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public HandlerThread(String name) &#123;</span><br><span class="line">    super(name);</span><br><span class="line">    mPriority = Process.THREAD_PRIORITY_DEFAULT;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * Constructs a HandlerThread.</span><br><span class="line"> * @param name</span><br><span class="line"> * @param priority The priority to run the thread at. The value supplied must be from </span><br><span class="line"> * &#123;@link android.os.Process&#125; and not from java.lang.Thread.</span><br><span class="line"> */</span><br><span class="line">public HandlerThread(String name, int priority) &#123;</span><br><span class="line">    super(name);</span><br><span class="line">    mPriority = priority;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>构造函数里面的mPriority，优先级相关的，可以根据自己的需求去设置。</p>
-<p>每次线程启动调用start()方法的时候，都会执行run()方法，来看看这个方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void <span class="function"><span class="title">run</span></span>() &#123;</span><br><span class="line">    mTid = Process.myTid();</span><br><span class="line">    Looper.prepare();</span><br><span class="line">    synchronized (this) &#123;</span><br><span class="line">        mLooper = Looper.myLooper();</span><br><span class="line">        notifyAll();</span><br><span class="line">    &#125;</span><br><span class="line">    Process.setThreadPriority(mPriority);</span><br><span class="line">    onLooperPrepared();</span><br><span class="line">    Looper.loop();</span><br><span class="line">    mTid = -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>在Looper.prepare()里面，其实就是创建looper对象，并赋值给mLooper.onLooperPrepared()里面是空方法，我们可以重写，做一些初始化的操作，然后调用Looper.loop()方法启动了了loop。在这里，我们有一些疑惑，synchronized？notifyAll()？稍后我们在来分析，我们先看看prepare()内部实现：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public static void <span class="function"><span class="title">prepare</span></span>() &#123;</span><br><span class="line">       prepare(<span class="literal">true</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   /**</span><br><span class="line">    * sThreadLocal.get() will <span class="built_in">return</span> null unless you<span class="string">'ve called prepare().</span></span><br><span class="line"><span class="string">    */</span></span><br><span class="line"><span class="string">   static final ThreadLocal&lt;Looper&gt; sThreadLocal = new ThreadLocal&lt;Looper&gt;();</span></span><br><span class="line"><span class="string">   private static void prepare(boolean quitAllowed) &#123;</span></span><br><span class="line"><span class="string">       if (sThreadLocal.get() != null) &#123;</span></span><br><span class="line"><span class="string">           throw new RuntimeException("Only one Looper may be created per thread");</span></span><br><span class="line"><span class="string">       &#125;</span></span><br><span class="line"><span class="string">       sThreadLocal.set(new Looper(quitAllowed));</span></span><br><span class="line"><span class="string">   &#125;</span></span><br></pre></td></tr></table></figure></p>
-<p>把创建的Looper对象放到的sThreadLocal。放进去总要取出来吧，我们来看看Looper.myLooper()内部的实现：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * Return the Looper object associated with the current thread.  Returns</span><br><span class="line"> * null <span class="keyword">if</span> the calling thread is not associated with a Looper.</span><br><span class="line"> */</span><br><span class="line">public static @Nullable Looper <span class="function"><span class="title">myLooper</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> sThreadLocal.get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>贼简单，就是把之前存进去的looper对象取出来并返回。现在looper创建了，总要用上吧，这个时候就应该想到handler了，我们来看看提供的获取handler的方法getThreadHandler()：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @<span class="built_in">return</span> a shared &#123;@link Handler&#125; associated with this thread</span><br><span class="line"> * @hide</span><br><span class="line"> */</span><br><span class="line">@NonNull</span><br><span class="line">public Handler <span class="function"><span class="title">getThreadHandler</span></span>() &#123;</span><br><span class="line">    <span class="keyword">if</span> (mHandler == null) &#123;</span><br><span class="line">        mHandler = new Handler(getLooper());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> mHandler;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这个方法可以获取一个有当前子线程looper的handler对象，我们来看看getLooper()，可以看出是获取looper对象的方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * This method returns the Looper associated with this thread. If this thread not been started</span><br><span class="line">  * or <span class="keyword">for</span> any reason isAlive() returns <span class="literal">false</span>, this method will <span class="built_in">return</span> null. If this thread</span><br><span class="line">  * has been started, this method will block until the looper has been initialized.  </span><br><span class="line">  * @<span class="built_in">return</span> The looper.</span><br><span class="line">  */</span><br><span class="line"> public Looper <span class="function"><span class="title">getLooper</span></span>() &#123;</span><br><span class="line">     <span class="keyword">if</span> (!isAlive()) &#123;</span><br><span class="line">         <span class="built_in">return</span> null;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     // If the thread has been started, <span class="built_in">wait</span> until the looper has been created.</span><br><span class="line">     synchronized (this) &#123;</span><br><span class="line">         <span class="keyword">while</span> (isAlive() &amp;&amp; mLooper == null) &#123;</span><br><span class="line">             try &#123;</span><br><span class="line">                 <span class="built_in">wait</span>();</span><br><span class="line">             &#125; catch (InterruptedException e) &#123;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="built_in">return</span> mLooper;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里面，isAlive()方法的意思是线程不正常运行就返回null，接着，如果looper还没创建好就wait()等待，创建后notifyAll。在这里，我们来分析下为什么会用到wait，notifyAll等相关：handler对象的创建方法（getThreadHandler()）调用是在UI线程里面，but，Looper在一个线程中执行创建的，为了确保looper创建完成之后在创建handler对象，所以需要wait(),notify()来处理线程同步问题。</p>
-<p>总结：HandlerThread其实就是一个封装了handler的Thread的子类，做好前奏工作后，让我们在线程中直接使用handler来处理一个或者多个异步操作。使用场景，就是适合那些多个并按顺序执行的耗时任务的相关需求，可以跟intentService配合使用。（intentService内部异步处理用的就是HandlerThread）</p>
-<p>有什么问题欢迎交流：<a href="mailto:893007592@qq.com" target="_blank" rel="noopener">893007592@qq.com</a></p>
+        <h2 id="问题提出"><a href="#问题提出" class="headerlink" title="问题提出"></a>问题提出</h2><p>习惯性的带着问题去研究事物的本质，问题提出：</p>
+<ol>
+<li>intentService是什么？</li>
+<li>intentService既然是服务？跟普通的service有什么区别？</li>
+<li>既然有service，为什么还会出现intentService，有什么优势呢？</li>
+<li>intentService的使用场景。</li>
+</ol>
+<h2 id="分析与解决问题"><a href="#分析与解决问题" class="headerlink" title="分析与解决问题"></a>分析与解决问题</h2><p>intentService是什么，我们来看看官方的解释：<br><img src="/2018/03/24/Android之intentService探索/intentService.jpeg" alt="图1.jpg"></p>
+<p>官网的意思就是：intentService 的基类是service，并按照要求处理异步请求（intent的方式发送，其实后面处理的就是intent），客户端通过 startService(intent)发送请求，服务就会按照需要启动，在子线程里面处理每一个intent，当全部intent处理完后就自杀。（差点过了4级，翻译的不好，有更好的翻译可以告诉我）</p>
+<p><img src="/2018/03/24/Android之intentService探索/2.jpg" alt="图2.jpg"></p>
+<p>很好，从这里，我们知道intentService本质上也是一个service,intentService继承于service，同时也可以得知，intentService是普通service的一种扩展，我们来看看它的扩展，放码过来吧~</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">    public void <span class="function"><span class="title">onCreate</span></span>() &#123;</span><br><span class="line">        super.onCreate();</span><br><span class="line">        HandlerThread thread = new HandlerThread(<span class="string">"IntentService["</span> + mName + <span class="string">"]"</span>);</span><br><span class="line">        thread.start();</span><br><span class="line"></span><br><span class="line">        mServiceLooper = thread.getLooper();</span><br><span class="line">        mServiceHandler = new ServiceHandler(mServiceLooper);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>我们来看看onCreate（）方法：<br>首先创建了一个HandlerThread（只是一个封装了一些东西的子线程，本文不深究，下篇在搞它），接着，用它的looper构造了一个handler对象mServiceHandler，由此我们可以得知，mServiceHandler发送的消息都会在HandlerThread中处理。看到handler，就应该有队列的概念，之前官网解释的处理每一个intent，就是根据先进先出原则依次处理的。<br>既然intentService是一个服务，多次启动，也是只会创建一次（onCreate()会调用一次），但是onStartCommand()，每次启动都会调用一次，我们来看看onStartCommand()里面究竟有什么：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public int onStartCommand(@Nullable Intent intent, int flags, int startId) &#123;</span><br><span class="line">    onStart(intent, startId);</span><br><span class="line">    <span class="built_in">return</span> mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>好吧，里面调用了onStart()方法，每次启动服务，onStart()每次也会调用咯，我们再去看看onStart():<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void onStart(@Nullable Intent intent, int startId) &#123;</span><br><span class="line">    Message msg = mServiceHandler.obtainMessage();</span><br><span class="line">    msg.arg1 = startId;</span><br><span class="line">    msg.obj = intent;</span><br><span class="line">    mServiceHandler.sendMessage(msg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里面，intentService发送了一个消息，这个消息，会在HandlerThread里面处理（因为looper是HandlerThread这个线程的），既然是子线程，那就可以做耗时的一些操作了。接下来，我们来看看mServiceHandler：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">private final class ServiceHandler extends Handler &#123;</span><br><span class="line">      public ServiceHandler(Looper looper) &#123;</span><br><span class="line">          super(looper);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      @Override</span><br><span class="line">      public void handleMessage(Message msg) &#123;</span><br><span class="line">          onHandleIntent((Intent)msg.obj);</span><br><span class="line">          stopSelf(msg.arg1);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>很对，就是这里，把发过来的消息给了onHandleIntent()去处理，处理完了直接stopSelf(msg.arg1)，这里没有用stopSelf()而是用stopSelf(int startId)来停止服务，是因为stopSelf()会立即停止服务，这个时候可能还有其他消息未处理，stopSelf(int startId)则会当所有消息处理完才会停止服务。回过头，我们再看看onHandleIntent()：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@WorkerThread</span><br><span class="line">   protected abstract void onHandleIntent(@Nullable Intent intent);</span><br></pre></td></tr></table></figure></p>
+<p>是一个抽象方法，别忘了intentService也是一个抽象类，我们要用intentService，就必须实现onHandleIntent()这个方法，这里面就是具体处理一些耗时的操作，比如下载之类的，需要开发者去实现这个方法。</p>
+<p>突然发现，intentService好简单，就是在service的基础上封装了一个handler和一个子线程HandlerThread。在方便我们使用的同时，它最主要的特点也显示出来了，使用队列去处理客户端发送的一个个请求。（说人话：就是多个耗时任务会按顺序依次执行）</p>
+<p>现在回头看我们提出的问题，其实都已经解答了，跟service的区别就是，intentService是它的加强版，实现了按顺序依次执行需求的功能，起到了管理的作用，service却不能做到，这就是优势。适合那些按顺序下载的需求场景。</p>
+<p>下面是一个模拟下载功能demo示例：<br>添加多个模拟下载功能，依次按顺序去处理，这是项目的展示图：</p>
+<p><img src="/2018/03/24/Android之intentService探索/show.gif" alt="show.jpg"><br>这个是github地址:<a href="https://github.com/niyige/IntentServiceDemo" target="_blank" rel="noopener">IntentServiceDemo</a></p>
 
       
     </div>
@@ -412,15 +417,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/" rel="next" title="Android Webview与JS交互之DSbridge源码分析">
+                <i class="fa fa-chevron-left"></i> Android Webview与JS交互之DSbridge源码分析
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/20/Android-Webview与JS交互之DSbridge源码分析/" rel="prev" title="Android Webview与JS交互之DSbridge源码分析">
-                Android Webview与JS交互之DSbridge源码分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
